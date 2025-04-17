@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neutron Proxy</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            color: white;
+            background-color: #0d0d0d; /* Dark background for the body */
+        }
+
+        #particles-js {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        .sidebar {
+            width: 80px; /* Slimmed-down sidebar */
+            background: rgba(15, 25, 40, 0.9);
+            padding: 20px 0;
+            backdrop-filter: blur(8px);
+            border-right: 1px solid rgba(63, 81, 181, 0.5);
+        }
+
+        .sidebar h1 {
+            font-size: 20px;
+            text-align: center;
+            color: #3D5AF1;
+            text-shadow: 0 0 10px rgba(61, 90, 243, 0.6);
+        }
+
+        nav {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .tab {
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin: 10px 0;
+            width: 50px; /* Button logos */
+            height: 50px; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%; /* Circular buttons */
+            background: transparent; /* Transparent background */
+        }
+
+        .tab:hover {
+            background: rgba(63, 81, 181, 0.7);
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+            transition: transform 0.6s ease-in-out;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .home-content, .proxy-content {
+            display: none;
+            width: 100%;
+            text-align: center;
+        }
+
+        .home-content.active, .proxy-content.active {
+            display: block;
+        }
+
+        .welcome-text {
+            font-size: 30px;
+            margin-bottom: 20px;
+        }
+
+        .subtext {
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        .get-started-button {
+            padding: 15px 30px;
+            background-color: #3D5AF1;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            font-size: 18px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .get-started-button:hover {
+            background-color: #3A5BFD;
+        }
+
+        /* Proxy Browser Styles */
+        .proxy-url-container {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            background: #0d3f8f; /* Dark blue background */
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .proxy-url-bar {
+            display: flex;
+            align-items: center;
+            flex: 1; /* Use available space */
+            margin-right: 10px;
+        }
+
+        .proxy-url-bar input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(63, 81, 181, 0.7);
+            outline: none;
+            color: #ffffff;
+            font-size: 18px;
+        }
+
+        .proxy-url-bar input[type="text"]:focus {
+            background: rgba(63, 81, 181, 1);
+        }
+
+        .proxy-navigation {
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .nav-button {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            width: 50px; /* Logo size */
+            height: 50px;
+            margin-right: 5px;
+        }
+
+        .nav-button img {
+            width: 100%; /* Use 100% width for the image */
+            height: 100%; /* Use 100% height for the image */
+        }
+
+        .proxy-browser {
+            flex: 1;
+            border: 1px solid rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        
+        .proxy-browser iframe {
+            width: 100%; /* Full width */
+            height: 80vh; /* Increase height for better visibility */
+        }
+
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>  <!-- Particle Background -->
+    <div class="container">
+        <aside class="sidebar">
+            <h1>NP</h1> <!-- Shortened title for the sidebar -->
+            <nav>
+                <div class="tab" data-tab="home">
+                    <img src="https://img.icons8.com/material-outlined/24/ffffff/home.png" alt="Home" />
+                </div>
+                <div class="tab" data-tab="proxy">
+                    <img src="https://img.icons8.com/material-outlined/24/ffffff/proxy.png" alt="Proxy" />
+                </div>
+                <div class="tab" data-tab="games">
+                    <img src="https://img.icons8.com/material-outlined/24/ffffff/game-controller.png" alt="Games" />
+                </div>
+                <div class="tab" data-tab="about">
+                    <img src="https://img.icons8.com/material-outlined/24/ffffff/info.png" alt="About" />
+                </div>
+            </nav>
+        </aside>
+        <main class="content">
+            <div class="home-content tab-content active">
+                <div class="welcome-text">Welcome to Neutron Proxy!</div>
+                <div class="subtext">Ready to get unblocked?</div>
+                <button class="get-started-button" onclick="showProxy()">Get Started</button>
+            </div>
+            <div class="proxy-content tab-content">
+                <h2>Proxy Browser</h2>
+                <div class="proxy-url-container">
+                    <div class="proxy-url-bar">
+                        <input type="text" id="url" placeholder="http://example.com" />
+                    </div>
+                    <div class="proxy-navigation">
+                        <button id="backBtn" class="nav-button" onclick="goBack()">
+                            <img src="https://img.icons8.com/material-outlined/24/ffffff/back.png" alt="Back" />
+                        </button>
+                        <button id="forwardBtn" class="nav-button" onclick="goForward()">
+                            <img src="https://img.icons8.com/material-outlined/24/ffffff/next.png" alt="Forward" />
+                        </button>
+                        <button id="reloadBtn" class="nav-button" onclick="reloadPage()">
+                            <img src="https://img.icons8.com/material-outlined/24/ffffff/refresh.png" alt="Reload" />
+                        </button>
+                        <button onclick="openProxy()" class="nav-button">Go</button>
+                    </div>
+                </div>
+                <div class="proxy-browser">
+                    <iframe id="proxyFrame" src="" loading="lazy"></iframe>
+                </div>
+            </div>
+            <div class="games tab-content">Check out our list of games!</div>
+            <div class="about tab-content">Learn more about our service!</div>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Hide all contents
+                    contents.forEach(content => content.classList.remove('active'));
+                    tabs.forEach(t => t.classList.remove('active-tab'));
+
+                    // Show the content that corresponds to the clicked tab
+                    const activeContent = document.querySelector(`.${tab.dataset.tab}-content`);
+                    activeContent.classList.add('active');
+                    tab.classList.add('active-tab');
+                });
+            });
+        });
+
+        const historyStack = [];
+        let historyIndex = -1;
+
+        function openProxy() {
+            const urlInput = document.getElementById('url');
+            const proxyFrame = document.getElementById('proxyFrame');
+
+            const url = urlInput.value.trim();
+            if (url) {
+                proxyFrame.src = url.includes('http') ? url : 'http://' + url;
+
+                // Manage history
+                historyStack.push(urlInput.value);
+                historyIndex++;
+                updateButtons();
+            } else {
+                alert("Please enter a valid URL");
+            }
+        }
+
+        function goBack() {
+            if (historyIndex > 0) {
+                historyIndex--;
+                const url = historyStack[historyIndex];
+                document.getElementById('url').value = url;
+                document.getElementById('proxyFrame').src = url;
+                updateButtons();
+            }
+        }
+
+        function goForward() {
+            if (historyIndex < historyStack.length - 1) {
+                historyIndex++;
+                const url = historyStack[historyIndex];
+                document.getElementById('url').value = url;
+                document.getElementById('proxyFrame').src = url;
+                updateButtons();
+            }
+        }
+
+        function reloadPage() {
+            const currentUrl = document.getElementById('url').value;
+            if (currentUrl) {
+                document.getElementById('proxyFrame').src = currentUrl.includes('http') ? currentUrl : 'http://' + currentUrl;
+            }
+        }
+
+        function updateButtons() {
+            document.getElementById('backBtn').disabled = historyIndex <= 0;
+            document.getElementById('forwardBtn').disabled = historyIndex >= historyStack.length - 1;
+        }
+
+        function showProxy() {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+
+            // Switch to proxy tab
+            tabs.forEach((tab, index) => {
+                tab.classList.remove('active-tab');
+                contents[index].classList.remove('active');
+            });
+
+            // Activate the proxy tab
+            document.querySelector('.tab[data-tab="proxy"]').classList.add('active-tab');
+            document.querySelector('.proxy-content').classList.add('active');
+        }
+
+        // Initialize particles.js
+        particlesJS("particles-js", {
+            particles: {
+                number: {
+                    value: 150,
+                    density: {
+                        enable: true,
+                        value_area: 800
+                    }
+                },
+                color: {
+                    value: "#3D5AF1"
+                },
+                shape: {
+                    type: "circle",
+                    stroke: {
+                        width: 0,
+                        color: "#000000"
+                    },
+                },
+                opacity: {
+                    value: 0.6,
+                    random: false,
+                    anim: {
+                        enable: true,
+                        speed: 1,
+                        opacity_min: 0.1,
+                        sync: false
+                    }
+                },
+                size: {
+                    value: 5,
+                    random: true,
+                    anim: {
+                        enable: false,
+                    }
+                },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: "#3D5AF1",
+                    opacity: 0.4,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: "none",
+                    random: false,
+                    straight: false,
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: {
+                        enable: true,
+                        mode: "repulse"
+                    },
+                    onclick: {
+                        enable: true,
+                        mode: "push"
+                    },
+                    resize: true
+                },
+                modes: {
+                    grab: {
+                        distance: 400,
+                        line_linked: {
+                            opacity: 1
+                        }
+                    },
+                    bubble: {
+                        distance: 400,
+                        size: 40,
+                        duration: 2,
+                        opacity: 8,
+                        speed: 3
+                    },
+                    repulse: {
+                        distance: 200,
+                        duration: 0.4
+                    },
+                    push: {
+                        particles_nb: 4
+                    },
+                    remove: {
+                        particles_nb: 2
+                    }
+                }
+            },
+            retina_detect: true
+        });
+    </script>
+</body>
+</html>
